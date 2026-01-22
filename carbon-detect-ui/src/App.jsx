@@ -1,92 +1,175 @@
+import { useState, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 
-
-
-
-import { useState, useMemo, useEffect } from "react";
-import Threads from "./components/Threads";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Success from "./pages/Success";
 import OAuthSuccess from "./pages/OAuthSuccess";
 import CompleteProfile from "./pages/CompleteProfile";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import DashboardLayout from "./pages/dashboard/DashboardLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import FriendApp from "./pages/FriendPage";
+
+import EventsPage from "./pages/EventsPage";
+import ScanQR from "./pages/ScanQR";
+
+
+
+
+
 import ClickSpark from "./components/ClickSpark";
 import "./App.css";
 
 const App = () => {
   const [page, setPage] = useState("login");
   const [message, setMessage] = useState("");
+  const location = useLocation();
 
-  /* 🔥 VERY IMPORTANT: detect OAuth redirect */
+  // OAuth redirect detection
   useEffect(() => {
-    if (window.location.pathname === "/oauth-success") {
+    if (location.pathname === "/oauth-success") {
       setPage("oauth-success");
     }
-  }, []);
-
-  const threadsBg = useMemo(
-    () => (
-      <Threads
-        amplitude={1}
-        distance={0}
-        color={[1, 1, 1]}
-        enableMouseInteraction={false}
-      />
-    ),
-    []
-  );
+  }, [location.pathname]);
 
   return (
     <div className="app-root">
-      {threadsBg}
+      {/* Background */}
+      <div className="bg-image" />
+      <div className="bg-overlay" />
 
       <ClickSpark sparkColor="#34d399" sparkRadius={18} sparkCount={10} />
 
       <div className="foreground">
-        {/* LOGIN */}
-        {page === "login" && (
-          <Login
-            switchToRegister={() => setPage("register")}
-            onSuccess={(msg = "Login Successful ✅") => {
-              setMessage(msg);
-              setPage("success");
-            }}
+        <Routes>
+          {/*  RESET PASSWORD (URL BASED) */}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
           />
-        )}
+          <Route
+  path="/maps"
+  element={
+    <ProtectedRoute>
+      <FriendApp />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/scan"
+  element={<ScanQR />}
+/>
 
-        {/* REGISTER */}
-        {page === "register" && (
-          <Register
-            switchToLogin={() => setPage("login")}
-            onSuccess={(msg = "Registration Successful 🎉") => {
-              setMessage(msg);
-              setPage("success");
-            }}
+
+
+          <Route
+            path="/events"
+            element={
+              <ProtectedRoute>
+                <EventsPage />
+              </ProtectedRoute>
+            }
           />
-        )}
 
-        {/* OAUTH SUCCESS */}
-        {page === "oauth-success" && (
-          <OAuthSuccess
-            onCompleteProfile={() => setPage("complete-profile")}
-            onSuccess={(msg) => {
-              setMessage(msg);
-              setPage("success");
-            }}
+
+          {/*  EXISTING FLOW */}
+          <Route
+            path="*"
+            element={
+              <>
+                {/* {page === "login" && (
+                  <Login
+                    switchToRegister={() => setPage("register")}
+                    onSuccess={(msg = "Login Successful ✅") => {
+                      setMessage(msg);
+                      setPage("success");
+                    }}
+                  />
+                )} */}
+                {page === "login" && (
+                  <Login
+                    switchToRegister={() => setPage("register")}
+                    switchToForgotPassword={() => setPage("forgot-password")}
+                    onSuccess={(msg = "Login Successful ✅") => {
+                      setMessage(msg);
+                      setPage("success");
+                    }}
+                  />
+                )}
+
+                {page === "register" && (
+                  <Register
+                    switchToLogin={() => setPage("login")}
+                    onSuccess={(msg = "Registration Successful 🎉") => {
+                      setMessage(msg);
+                      setPage("success");
+                    }}
+                  />
+                )}
+
+                {page === "forgot-password" && (
+                  <ForgotPassword onBack={() => setPage("login")} />
+                )}
+
+
+
+                {/* {page === "oauth-success" && (
+                  <OAuthSuccess
+                    onCompleteProfile={() => setPage("complete-profile")}
+                    onSuccess={(msg) => {
+                      setMessage(msg);
+                      setPage("success");
+                    }}
+                  />
+                )} */}
+                {page === "oauth-success" &&
+                  (localStorage.getItem("token") ? (
+                    <OAuthSuccess
+                      onCompleteProfile={() => setPage("complete-profile")}
+                      onSuccess={(msg) => {
+                        setMessage(msg);
+                        setPage("success");
+                      }}
+                    />
+                  ) : (
+                    setPage("login")
+                  ))}
+
+
+                {/* {page === "complete-profile" && (
+                  <CompleteProfile
+                    onDone={(msg) => {
+                      setMessage(msg);
+                      setPage("success");
+                    }}
+                  />
+                )} */}
+                {page === "complete-profile" &&
+                  (localStorage.getItem("token") ? (
+                    <CompleteProfile
+                      onDone={(msg) => {
+                        setMessage(msg);
+                        setPage("success");
+                      }}
+                    />
+                  ) : (
+                    setPage("login")
+                  ))}
+
+
+
+                {page === "success" && <Success message={message} />}
+              </>
+            }
           />
-        )}
-
-        {/* COMPLETE PROFILE */}
-        {page === "complete-profile" && (
-          <CompleteProfile
-            onDone={(msg) => {
-              setMessage(msg);
-              setPage("success");
-            }}
-          />
-        )}
-
-        {/* FINAL SUCCESS */}
-        {page === "success" && <Success message={message} />}
+        </Routes>
       </div>
     </div>
   );

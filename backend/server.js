@@ -24,6 +24,10 @@ app.use(passport.initialize());
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/auth", require("./routes/authOAuth"));
 app.use("/api/profile", require("./routes/profileRoutes"));
+app.use("/api/events", require("./routes/eventRoutes"));
+
+app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
 
 // db

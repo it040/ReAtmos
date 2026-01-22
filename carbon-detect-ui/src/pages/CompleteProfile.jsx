@@ -1,66 +1,32 @@
 import { useState } from "react";
-import CustomSelect from "../components/CustomSelect";
-
-const roles = [
-  { label: "Student", value: "student" },
-  { label: "Organizer", value: "organizer" },
-  { label: "Institution", value: "institution" },
-  { label: "Company", value: "company" },
-];
+import { completeProfile } from "../services/authService";
 
 const CompleteProfile = ({ onDone }) => {
-  const [role, setRole] = useState(null);
-  const [org, setOrg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
-    if (!role || !org) {
-      alert("All fields required");
-      return;
-    }
+    try {
+      setLoading(true);
 
-    const res = await fetch(
-      "http://localhost:5000/api/profile/complete-profile",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          role: role.value,
-          organizationName: org,
-        }),
-      }
-    );
+      await completeProfile({});
 
-    const data = await res.json();
-
-    if (res.ok) {
       onDone("Profile Completed 🎉");
-    } else {
-      alert(data.message);
+    } catch {
+      //  DO NOTHING
+      // auth errors are handled globally (silent logout)
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Complete Profile</h2>
+        <h2>Profile Setup</h2>
+        <p>Your profile is almost ready!</p>
 
-        <CustomSelect
-          options={roles}
-          placeholder="Select Role"
-          value={role}
-          onChange={setRole}
-        />
-
-        <input
-          placeholder="Organization / Institution"
-          onChange={(e) => setOrg(e.target.value)}
-        />
-
-        <button className="auth-btn" onClick={submit}>
-          Continue
+        <button className="auth-btn" onClick={submit} disabled={loading}>
+          {loading ? "Setting up..." : "Continue"}
         </button>
       </div>
     </div>
