@@ -2,7 +2,7 @@ pandas
 numpy
 torch
 scikit-learn
-matplotlib
 flask
 flask-cors
 requests
+deplo
