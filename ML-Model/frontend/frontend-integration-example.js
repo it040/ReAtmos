@@ -164,8 +164,8 @@ export function AQIForecastCard({ state, area }) {
       {/* Current Status */}
       {forecast.comparison_report?.has_realtime_data && (
         <div className="realtime-status">
-          <p>🌍 Real-time AQI: {forecast.comparison_report.realtime_aqi}</p>
-          <p>📊 Using live calibration for accuracy</p>
+          <p>Real-time AQI: {forecast.comparison_report.realtime_aqi}</p>
+          <p>Using live calibration for accuracy</p>
         </div>
       )}
 
@@ -269,7 +269,7 @@ export function AQIPredictionAccuracy({ state, area }) {
 
       {/* Improvement Badge */}
       <div className="improvement-badge success">
-        ✅ Accuracy Improved by{" "}
+         Accuracy Improved by{" "}
         {comparison.accuracy_metrics.improvement_percent.toFixed(0)}%
       </div>
 
@@ -281,10 +281,10 @@ export function AQIPredictionAccuracy({ state, area }) {
             <div key={day.day} className="day-comparison">
               <p className="day-label">Day {day.day}</p>
               <p className="raw-value" title="Raw prediction from model">
-                📊 {comparison.raw_predictions[idx].aqi}
+                {comparison.raw_predictions[idx].aqi}
               </p>
               <p className="adjusted-value" title="Calibrated with real-time">
-                ✅ {day.aqi}
+                {day.aqi}
               </p>
             </div>
           ))}
