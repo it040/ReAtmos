@@ -19,7 +19,7 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <span className="logo-icon">🌍</span>
+          <span className="logo-icon"></span>
           <span className="logo-text">ReAtmos</span>
         </Link>
 
@@ -30,7 +30,7 @@ const Navbar = () => {
               to="/"
               className={`nav-link ${isActive('/') ? 'active' : ''}`}
             >
-              🏠 Home
+               Home
             </Link>
           </li>
           <li className="nav-item">
@@ -38,7 +38,7 @@ const Navbar = () => {
               to="/aqi-predictor"
               className={`nav-link ${isActive('/aqi-predictor') ? 'active' : ''}`}
             >
-              📊 AQI Predictor
+              AQI Predictor
             </Link>
           </li>
         </ul>
