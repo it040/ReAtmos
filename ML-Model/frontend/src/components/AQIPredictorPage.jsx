@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import AQILineChart from './AQILineChart';
 import AQISummaryCards from './AQISummaryCards';
 import HealthAdvisory from './HealthAdvisory';
 import GoOutsideIndicator from './GoOutsideIndicator';
 import AQIInfoModal from './AQIInfoModal';
 import { generateSampleForecast } from '../utils/aqi-utils';
-import { fetchAQIPrediction } from '../utils/api';
 import './AQIPredictorPage.css';
 
 /**
@@ -34,12 +34,17 @@ const AQIPredictorPage = () => {
     setForecastData(null);
 
     try {
-      const data = await fetchAQIPrediction(state.trim(), area.trim());
+      const response = await axios.get('http://43.205.238.114:5000/predict', {
+        params: {
+          state: state.trim(),
+          area: area.trim(),
+        },
+      });
 
-      if (data.status === 'success') {
+      if (response.data.status === 'success') {
         // Add date field to forecast data for components
         const today = new Date();
-        const forecastWithDates = data.forecast.map((item, index) => {
+        const forecastWithDates = response.data.forecast.map((item, index) => {
           const date = new Date(today);
           date.setDate(date.getDate() + index);
           return {
@@ -49,16 +54,19 @@ const AQIPredictorPage = () => {
           };
         });
         setForecastData(forecastWithDates);
-        setLocation(`${data.area}, ${data.state}`);
+        setLocation(`${response.data.area}, ${response.data.state}`);
         setSelectedDay(0);
       } else {
-        setError(data.message || 'Failed to fetch forecast');
+        setError(response.data.message || 'Failed to fetch forecast');
       }
     } catch (err) {
-      setError(
-        err.message ||
-        'Error fetching forecast. Please check the backend URL and try again.'
-      );
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.message === 'Network Error') {
+        setError('Unable to connect to the server. Make sure the Flask backend is running on http://localhost:5000');
+      } else {
+        setError('Error fetching forecast. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
