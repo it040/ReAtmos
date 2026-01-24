@@ -9,7 +9,7 @@ const BACKEND_URL = "http://43.205.238.114:5000";
  * Fetch AQI prediction from backend
  * @param {string} state - The state/region name
  * @param {string} area - The area/city name
- * @returns {Promise} - Response from the backend API
+ * @returns {Promise} - Response from the API
  */
 export const fetchAQIPrediction = async (state, area) => {
   try {
@@ -26,7 +26,7 @@ export const fetchAQIPrediction = async (state, area) => {
   } catch (error) {
     throw new Error(
       error.message === "Network Error"
-        ? "Unable to connect to the server. Make sure the Flask backend is running."
+        ? "Unable to connect to the server. Make sure the backend is running at http://43.205.238.114:5000"
         : error.message,
     );
   }
