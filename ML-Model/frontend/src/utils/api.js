@@ -1,33 +1,20 @@
 /**
  * API Utility Functions
- * Centralized API endpoint configuration and requests
+ * Uses Vercel API proxy (HTTPS-safe)
  */
 
-const BACKEND_URL = "http://43.205.238.114:5000";
-
-/**
- * Fetch AQI prediction from backend
- * @param {string} state - The state/region name
- * @param {string} area - The area/city name
- * @returns {Promise} - Response from the API
- */
 export const fetchAQIPrediction = async (state, area) => {
   try {
     const response = await fetch(
-      `${BACKEND_URL}/predict?state=${encodeURIComponent(state)}&area=${encodeURIComponent(area)}`,
+      `/api/predict?state=${encodeURIComponent(state)}&area=${encodeURIComponent(area)}`,
     );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    throw new Error(
-      error.message === "Network Error"
-        ? "Unable to connect to the server. Make sure the backend is running at http://43.205.238.114:5000"
-        : error.message,
-    );
+    throw new Error("Unable to fetch AQI prediction");
   }
 };
