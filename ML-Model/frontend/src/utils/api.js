@@ -1,12 +1,13 @@
 /**
  * API Utility Functions
- * Uses Vercel API proxy (HTTPS-safe)
+ * Calls the backend server directly
  */
 
 export const fetchAQIPrediction = async (state, area) => {
   try {
+    // Call the predict endpoint through the proxy
     const response = await fetch(
-      `/api/predict?state=${encodeURIComponent(state)}&area=${encodeURIComponent(area)}`,
+      `/predict?state=${encodeURIComponent(state)}&area=${encodeURIComponent(area)}`,
     );
 
     if (!response.ok) {
@@ -15,6 +16,9 @@ export const fetchAQIPrediction = async (state, area) => {
 
     return await response.json();
   } catch (error) {
-    throw new Error("Unable to fetch AQI prediction");
+    console.error("API Error:", error);
+    throw new Error(
+      "Unable to fetch AQI prediction. Make sure the backend is running.",
+    );
   }
 };
