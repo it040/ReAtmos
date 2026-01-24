@@ -16,6 +16,17 @@ import './AQILineChart.css';
  * Displays 7-day AQI predictions with bright green line
  */
 const AQILineChart = ({ data, selectedDay, onDaySelect }) => {
+  // Calculate dynamic Y-axis domain for better precision
+  const aqiValues = data.map(d => d.aqi);
+  const minAQI = Math.min(...aqiValues);
+  const maxAQI = Math.max(...aqiValues);
+  const range = maxAQI - minAQI;
+  
+  // Add 15% padding above and below to show better range
+  const padding = Math.max(range * 0.15, 10); // Minimum 10 unit padding
+  const yAxisMin = Math.max(0, minAQI - padding);
+  const yAxisMax = maxAQI + padding;
+  
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -39,7 +50,7 @@ const AQILineChart = ({ data, selectedDay, onDaySelect }) => {
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
           data={data}
-          margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+          margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
           onClick={(e) => {
             if (e && e.activeLabel !== undefined) {
               const dayIndex = data.findIndex((d) => d.day === e.activeLabel);
@@ -55,9 +66,15 @@ const AQILineChart = ({ data, selectedDay, onDaySelect }) => {
             stroke="#999999"
           />
           <YAxis
-            label={{ value: 'AQI (0-500)', angle: -90, position: 'insideLeft' }}
-            domain={[0, 350]}
+            label={{ value: 'AQI', angle: -90, position: 'left', offset: -5 }}
+            domain={[yAxisMin, yAxisMax]}
             stroke="#999999"
+            type="number"
+            tickFormatter={(value) => {
+              // Only show integer values to avoid 499999 issue
+              return Math.round(value).toString();
+            }}
+            ticks={Math.ceil((yAxisMax - yAxisMin) / 10) > 0 ? undefined : [yAxisMin, yAxisMax]}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ paddingTop: '20px' }} />
